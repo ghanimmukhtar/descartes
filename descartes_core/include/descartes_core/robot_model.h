@@ -21,6 +21,7 @@
 
 // TODO: The include below picks up Eigen::Affine3d, but there is probably a better way
 #include <moveit/kinematic_constraints/kinematic_constraint.h>
+#include <moveit/planning_scene/planning_scene.h>
 #include "descartes_core/utils.h"
 
 namespace descartes_core
@@ -39,21 +40,21 @@ DESCARTES_CLASS_FORWARD(RobotModel);
 class RobotModel
 {
 public:
-  virtual ~RobotModel()
-  {
-  }
+    virtual ~RobotModel()
+    {
+    }
 
-  /**
+    /**
    * @brief Returns the joint pose closest to the seed pose for a desired affine pose
    * @param pose Affine pose of TOOL in WOBJ frame
    * @param seed_state Joint position seed (returned solution is "close" to the seed).
    * @param joint_pose Solution (if function successful).
    * @return True if successful
    */
-  virtual bool getIK(const Eigen::Affine3d &pose, const std::vector<double> &seed_state,
-                     std::vector<double> &joint_pose) const = 0;
+    virtual bool getIK(const Eigen::Affine3d &pose, const std::vector<double> &seed_state,
+                       std::vector<double> &joint_pose) const = 0;
 
-  /**
+    /**
    * @brief Returns "all" the joint poses("distributed" in joint space) for a desired affine pose.
    * "All" is determined by each implementation (In the worst case, this means at least getIK).
    * "Distributed" is determined by each implementation.
@@ -61,37 +62,37 @@ public:
    * @param joint_poses Solution (if function successful).
    * @return True if successful
    */
-  virtual bool getAllIK(const Eigen::Affine3d &pose, std::vector<std::vector<double> > &joint_poses) const = 0;
+    virtual bool getAllIK(const Eigen::Affine3d &pose, std::vector<std::vector<double> > &joint_poses) const = 0;
 
-  /**
+    /**
    * @brief Returns the affine pose
    * @param joint_pose Solution (if function successful).
    * @param pose Affine pose of TOOL in WOBJ frame
    * @return True if successful
    */
-  virtual bool getFK(const std::vector<double> &joint_pose, Eigen::Affine3d &pose) const = 0;
+    virtual bool getFK(const std::vector<double> &joint_pose, Eigen::Affine3d &pose) const = 0;
 
-  /**
+    /**
    * @brief Returns number of DOFs
    * @return Int
    */
-  virtual int getDOF() const = 0;
+    virtual int getDOF() const = 0;
 
-  /**
+    /**
    * @brief Performs all necessary checks to determine joint pose is valid
    * @param joint_pose Pose to check
    * @return True if valid
    */
-  virtual bool isValid(const std::vector<double> &joint_pose) const = 0;
+    virtual bool isValid(const std::vector<double> &joint_pose) const = 0;
 
-  /**
+    /**
    * @brief Performs all necessary checks to determine affine pose is valid
    * @param pose Affine pose of TOOL in WOBJ frame
    * @return True if valid
    */
-  virtual bool isValid(const Eigen::Affine3d &pose) const = 0;
+    virtual bool isValid(const Eigen::Affine3d &pose) const = 0;
 
-  /**
+    /**
    * @brief Initializes the robot model when it is instantiated as a moveit_core plugin.
    * @param robot_description name of the ros parameter containing the urdf description
    * @param group_name the manipulation group for all the robot links that are part of the same kinematic chain
@@ -99,28 +100,32 @@ public:
    * @param tcp_frame tool link attached to the robot. When it's not in 'group_name' then it should have
    * a fixed location relative to the last link in 'group_name'.
    */
-  virtual bool initialize(const std::string &robot_description, const std::string &group_name,
-                          const std::string &world_frame, const std::string &tcp_frame) = 0;
+    virtual bool initialize(const std::string &robot_description, const std::string &group_name,
+                            const std::string &world_frame, const std::string &tcp_frame) = 0;
 
-  /**
+    virtual void setplanningscene(const planning_scene::PlanningScenePtr& my_planning_scene) = 0;
+
+    virtual void getplanningscene(planning_scene::PlanningScenePtr& my_planning_scene) = 0;
+
+    /**
    * @brief Enables collision checks
    * @param check_collisions enables or disables collisions
    */
-  virtual void setCheckCollisions(bool check_collisions)
-  {
-    check_collisions_ = check_collisions;
-  }
+    virtual void setCheckCollisions(bool check_collisions)
+    {
+        check_collisions_ = check_collisions;
+    }
 
-  /**
+    /**
    * @brief Indicates if collision checks are enabled
    * @return Bool
    */
-  virtual bool getCheckCollisions()
-  {
-    return check_collisions_;
-  }
+    virtual bool getCheckCollisions()
+    {
+        return check_collisions_;
+    }
 
-  /**
+    /**
    * @brief Performs necessary checks to see if the robot is capable of moving from the initial joint pose
    *        to the final pose in dt seconds
    * @param  from_joint_pose [description]
@@ -128,15 +133,15 @@ public:
    * @param  dt              [description]
    * @return                 [description]
    */
-  virtual bool isValidMove(const std::vector<double> &from_joint_pose, const std::vector<double> &to_joint_pose,
-                           double dt) const = 0;
+    virtual bool isValidMove(const std::vector<double> &from_joint_pose, const std::vector<double> &to_joint_pose,
+                             double dt) const = 0;
 
 protected:
-  RobotModel() : check_collisions_(false)
-  {
-  }
+    RobotModel() : check_collisions_(false)
+    {
+    }
 
-  bool check_collisions_;
+    bool check_collisions_;
 };
 
 }  // descartes_core

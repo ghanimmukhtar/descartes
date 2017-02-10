@@ -94,6 +94,10 @@ public:
    */
   void setState(const moveit::core::RobotState &state);
 
+  void setplanningscene(const planning_scene::PlanningScenePtr& my_planning_scene);
+
+  void getplanningscene(planning_scene::PlanningScenePtr& my_planning_scene);
+
 protected:
   /**
    * Gets IK solution (assumes robot state is pre-seeded)

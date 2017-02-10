@@ -76,6 +76,14 @@ bool MoveitStateAdapter::initialize(const std::string& robot_description, const 
   return initialize(robot_model_loader_->getModel(), group_name, world_frame, tcp_frame);
 }
 
+void MoveitStateAdapter::setplanningscene(const planning_scene::PlanningScenePtr& my_planning_scene){
+    planning_scene_ = my_planning_scene;
+}
+
+void MoveitStateAdapter::getplanningscene(planning_scene::PlanningScenePtr& my_planning_scene){
+    my_planning_scene = planning_scene_;
+}
+
 bool MoveitStateAdapter::initialize(robot_model::RobotModelConstPtr robot_model, const std::string &group_name,
                                     const std::string &world_frame, const std::string &tcp_frame)
 {
@@ -283,7 +291,7 @@ bool MoveitStateAdapter::isInCollision(const std::vector<double>& joint_pose) co
     for(int i = 0; i < my_world_objects.size(); i++)
         std::cout << "name of object number: " << i << " is: " << my_world_objects[i] << std::endl;*/
     in_collision = planning_scene_->isStateColliding(*robot_state_, group_name_);
-    //if(in_collision) ROS_ERROR("*********** I am in collision :) ****************");
+    if(in_collision) ROS_ERROR("*********** I am in collision :) ****************");
   }
   return in_collision;
 }
